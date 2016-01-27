@@ -175,8 +175,8 @@ Chúng ta cùng xem xét 1 vài ví dụ về HTTP GET từ 1 người dùng tê
  curl -X PUT [...] /
  http://swift.example.com/v1/AUTH_bob/container1 -T object.jpg
 - List các đối tượng trong container
- curl -X GET [...] /
+ curl -X GET [...]
  http://swift.example.com/v1/AUTH_bob/container1 
 - Download 1 đối tượng
- curl -X GET [...] /
+ curl -X GET [...]
  http://swift.example.com/v1/AUTH_bob/container1/object.jpg 
