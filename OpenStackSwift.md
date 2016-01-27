@@ -82,8 +82,9 @@ Thông số partion power(?).
 
 <img src="http://i.imgur.com/lgkmL2H.png"> 
 
-Replica count:(Số bản sao) thường là 3
-Replica locks: Khóa dữ liệu khi có sự dịch chuyển ổ.
+- Replica count:(Số bản sao) thường là 3.
+
+- Replica locks: Khóa dữ liệu khi có sự dịch chuyển ổ.
 
 Ngoài sử dụng vòng rings thì còn sử dụng 2 thông số:
 
