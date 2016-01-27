@@ -105,3 +105,73 @@ Mỗi lần Swift xây dựng rings, 2 cấu trúc dữ liệu nội bộ quan t
 - Bảng tra cứu thiết bị: Bảng này chứa 1 hàng cho mỗi bản sao và cột là cho mỗi partion trong cluster, thường là có 3 hàng và hàng ngàn cột. Ring-bui;để tính toán các ổ đĩa tối ưu để đặt mỗi bản sao phân vùng trên ổ đĩa bằng cách sử dụng các trọng số và thuật toán sắp xếp unique-as-posible. Sau đó ghi lại các ổ vào trong bảng
 
 <img src="http://i.imgur.com/TWTHthh.png">
+
+#Chapter 4: Basic Swift
+##Gửi yêu cầu
+Nếu bạn gửi yêu cầu tới các Swift cluster, nó phải chứa đủ các thành phần sau:
+###1. Storage URL: 
+Cách yêu cầu gửi đến cluster và phải chỉ ra được vị trí trong cluster mà yêu cầu nhắm đến
+- Vị trí cluster (swift.example.com/v1): Phần đầu của Storage URL là 1 endpoint trong cluster. Nó được sửu dụng bởi việc mạng sẽ định tuyến yêu cyaf tới các node có tiến trình máy chủ proxy để yêu cầu của bạn có thể được sử lý
+- Vị trí lưu trữ (account/container/object): bào gồm 1 hoặc nhiều phần tạo nên sự duy nhất của vị trí dữ liệu. Các vị trí lưu trữ ccos thể là 1 trong 3 dạng tùy thuộc vào tài nnguyeen mà bạn đang có gắng gửi yêu cầu:
+ + Account: /account
+ + Container: /account/container
+ + Object: /account/container/object
+Lưu ý: Tên đối tượng có thể chứa ký tự gạch chéo (/) vì vậy việc giả lồng thư mục là hoàn toàn có thể xảy ra
+
+###2.Thông tin xác thực
+- Thông qua những thông tin xác thực ở mỗi lần gửi yêu cầu
+- Thông qua xác thực token
+
+###3.Động từ HTTP
+Chúng ta sẽ xem xét kỹ những hành động khác nhau khi yều cầu giao tiếp với HTTP. Swift sử dụng các động từ chuẩn HTTP như sau:
+- GET: Download object(cùng metadata), hoặc list nội dung của container hoặc account
+- PUT: upload object, tạo container hoặc ghi đè metadata headers.
+- POST: cập nhật metadata (account hoặc container) ghi đè metadata(đối tượng) hoặc tạo container nếu nó chưa tồn tại
+- DELETE: xóa object hoặc container trống
+- HEAD: Lấy thông tin header, bao gồm metadata của account, container, object
+
+###4. Tùy chọn: dữ liệu hoặc metadata được ghi.
+
+##Ủy quyền
+Mặc dù người dùng có thể có thông tin hợp lệ để truy cập vào Swift cluster, nhưng họ có thể không được cấp phép cho những hành động mà họ gửi trong yêu cầu. Các máy chủ proxy sẽ cần xác nhận ủy quyền trước khi cho phép các yêu cầu để hoàn thành
+Ví dụ: Nếu bản gửi 1 yêu cầu với thông tin hợp lệ, nhưng cố gắng thêm dữ liệu vào 1 account khác thì bạn vẫn sẽ được xác thực nhưng sẽ bị từ chối yêu cầu.
+Nếu các hành động là được phép, các tiến trình máy chỉ proxy sẽ gọi đúng các node được yêu cầu, các node sẽ trả về kết quả của yêu cầu, và proxy sẽ trả về các phản hồi HTTP.
+
+##Phản hồi
+Các phản hồi từ Swift cluster sẽ chứa 2, hoặc thường là 3 các thành phần sau:
+- Mã phản hồi và mô tả
+- Header
+- Data
+Mã phản hồi và mô tả sẽ cho bạn biết biết yêu cầu của bạn được hoàn thành. Rộng ra có 5 mẫu mã phản hồi
+- 1xx(thông tin): ví dụ 100 continue
+- 2xx(thành công): ví dụ 200 OK hoặc 201 created
+- 3xx(chuyển hướng): ví dụ 300 multiple choices hoặc 301 Moved Permanently
+- 4xx(lỗi người dùng): ví dụ 400 bad request hoặc 401 là unauthorized
+- 5xx(lỗi server): 500  Internal Server Error
+
+##Sử dụng CLI
+Command-Line Interfaces
+Chúng ta sẽ xem xét 2 câu lệnh cURL vs Swift. Cả 2 câu lệnh đều cho phép người dùng gửi yêu cầu 1 dòng 1 lần tới các Swift Cluster. 
+
+Sử dụng cURL (clinent for URL)
+là câu lệnh phổ biến để chuyển dữ liệu đến và đi sử dụng các cấu trúc URL. Nó thường được cài đặt trước hoặc dẽ dàng được cài đặt bằng câu lệnh. cURL cung cấp chi tiết kiểm soát yêu cầy HTTP nên nó có thể xử lý tất cả các yêu cầu Swift. Vì cURL lấy các động từ HTTP 1 cách rõ ràng nên nó thường được sử dụng cung cấp ví dụ cho Swift
+cURL gồm các thành phần sau:
++ curl
++ -X <method> tùy chọn chỉ ra động từ HTTP (get, post, put..)
++ thông tin xác thực
++ đường dẫn storage URL
++ Dữ liệu hoặc metadata (tùy chọn)
+
+curl -X <HTTL-verb> [] <storage-url> <object.ext>
+
+Chúng ta cùng xem xét 1 vài ví dụ về HTTP GET từ 1 người dùng tên Bob để xem cách cURL được sử dụng cho object, container, account. 1 cách phổ biến để sử dụng Swift là nơi mọi người dùng đều có chính xác 1 tài khoảnh. Chúng ra sẽ sử dụng mô hinhg đó ở đây, nên URL cho Bob sẽ là  http://swift.example.com/v1/AUTH_bob. Đây sẽ là những tác vụ mà Bob sẽ thực hiên thông thường trong Swift.
+- Tạo conainter mới: tạo lệnh put với vị trí container mới
+ curl -X PUT [...] http://swift.example.com/v1/AUTH_bob/container2 
+- List tất cả các container có trong account sử dụng get và chỉ ra địa chỉ account
+ curl -X GET [...] http://swift.example.com/v1/AUTH_bob 
+- Upload đối tượng: sử dụng PUT tới vị trí của đối tượng
+ curl -X PUT [...] http://swift.example.com/v1/AUTH_bob/container1 -T object.jpg
+- List các đối tượng trong container
+ curl -X GET [...] http://swift.example.com/v1/AUTH_bob/container1 
+- Download 1 đối tượng
+ curl -X GET [...] http://swift.example.com/v1/AUTH_bob/container1/object.jpg 
