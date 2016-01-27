@@ -166,12 +166,17 @@ curl -X <HTTL-verb> [] <storage-url> <object.ext>
 
 Chúng ta cùng xem xét 1 vài ví dụ về HTTP GET từ 1 người dùng tên Bob để xem cách cURL được sử dụng cho object, container, account. 1 cách phổ biến để sử dụng Swift là nơi mọi người dùng đều có chính xác 1 tài khoảnh. Chúng ra sẽ sử dụng mô hinhg đó ở đây, nên URL cho Bob sẽ là  http://swift.example.com/v1/AUTH_bob. Đây sẽ là những tác vụ mà Bob sẽ thực hiên thông thường trong Swift.
 - Tạo conainter mới: tạo lệnh put với vị trí container mới
- curl -X PUT [...] http://swift.example.com/v1/AUTH_bob/container2 
+ curl -X PUT [...] /
+ http://swift.example.com/v1/AUTH_bob/container2 
 - List tất cả các container có trong account sử dụng get và chỉ ra địa chỉ account
- curl -X GET [...] http://swift.example.com/v1/AUTH_bob 
+ curl -X GET [...] /
+ http://swift.example.com/v1/AUTH_bob 
 - Upload đối tượng: sử dụng PUT tới vị trí của đối tượng
- curl -X PUT [...] http://swift.example.com/v1/AUTH_bob/container1 -T object.jpg
+ curl -X PUT [...] /
+ http://swift.example.com/v1/AUTH_bob/container1 -T object.jpg
 - List các đối tượng trong container
- curl -X GET [...] http://swift.example.com/v1/AUTH_bob/container1 
+ curl -X GET [...] /
+ http://swift.example.com/v1/AUTH_bob/container1 
 - Download 1 đối tượng
- curl -X GET [...] http://swift.example.com/v1/AUTH_bob/container1/object.jpg 
+ curl -X GET [...] /
+ http://swift.example.com/v1/AUTH_bob/container1/object.jpg 
